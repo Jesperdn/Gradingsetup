@@ -5,6 +5,7 @@ Bash script for setting up grading enviroment for student delieveries.
 ## Usage
 
 `$ bash setupscript <obligdir> <templatefile>`
+
 Creates markdown file based on a template in the script directory.
 The directory should be as follows before starting the script:
 
