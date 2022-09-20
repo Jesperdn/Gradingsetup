@@ -1,0 +1,89 @@
+#!/bin/bash
+
+: ' cd_up()
+    
+    cd up n directory levels
+
+Args:
+    $1 The number of directory levels to ascend
+
+'
+cd_up() {
+    local n=$(($1))
+
+    for i in {0 .. n}; do
+        cd ..
+    done
+}
+
+
+: ' copy_feedback_file()
+
+    Copy the template file into directory
+    
+Args:
+    $1 The username/name of the directory
+    $2 The name of the oblig folder
+    $3 The name of the template file
+'
+copy_feedback_file() {
+    local username=$(basename $1)
+    local oblig=$2
+    local template=$3
+
+    if [[ -e $template ]]; then
+        cp $template $oblig/$username/deadline*
+    fi
+}
+
+
+: ' rename_feedback_file()
+
+    Rename the copied template file to corresponding username of student
+
+Args:
+    $1 The username of wich to name the file
+    $2 The name of the oblig folder
+    $3 The name of the template file
+    
+'
+rename_feedback_file() {
+    local username=$(basename $1)
+    local oblig=$2
+    local template=$3
+
+
+    cd $oblig/$username/deadline*
+    if [[ -e $template ]]; then
+        mv $template $username.md
+    fi
+
+    echo "[!] Created file $username.md in directory $(pwd)"
+    cd_up 2
+}
+
+
+
+
+
+if [[ $# -ne 2 ]]; then
+    echo "[ERR] Usage: bash setupscript <obligdir> <templatefile>"
+    exit 2
+fi
+if [[ ! -e $1 ]]; then
+    echo "[ERR] Directory $1 does not exist."
+    exit 2
+fi
+
+
+echo "Running setup in $1:"
+for filename in $1/*; do
+
+    if [[ $filename == "$1/output" || $filename == "$1/input" ]]; then
+        echo "[!!] Skipping $filename."
+        continue
+    else 
+        copy_feedback_file $filename $1 $2
+        rename_feedback_file $filename $1 $2
+    fi
+done
